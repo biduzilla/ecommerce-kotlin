@@ -18,9 +18,12 @@ class LoginActivity : AppCompatActivity() {
         configClicks()
     }
 
-    private fun configClicks(){
+    private fun configClicks() {
         binding.btnRecuperarSenha.setOnClickListener {
             startActivity(Intent(this, RecuperaContaActivity::class.java))
+        }
+        binding.btnCadastro.setOnClickListener {
+            startActivity(Intent(this, CadastrarContaActivity::class.java))
         }
     }
 }
