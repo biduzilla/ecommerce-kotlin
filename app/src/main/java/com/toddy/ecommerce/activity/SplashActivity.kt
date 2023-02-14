@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.toddy.ecommerce.MainActivity
 import com.toddy.ecommerce.R
+import com.toddy.ecommerce.auth.LoginActivity
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +20,7 @@ class SplashActivity : AppCompatActivity() {
 
         val handler = Handler(Looper.getMainLooper()).postDelayed(Runnable {
             finish()
-            startActivity(Intent(this,MainActivity::class.java))
+            startActivity(Intent(this,LoginActivity::class.java))
         }, 3000)
     }
 }
