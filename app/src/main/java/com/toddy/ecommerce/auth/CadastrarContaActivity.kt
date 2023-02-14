@@ -1,6 +1,7 @@
 package com.toddy.ecommerce.auth
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -75,6 +76,11 @@ class CadastrarContaActivity : AppCompatActivity() {
                 val id:String = it.result.user!!.uid
                 user.id = id
                 user.salvar()
+
+                val intent = Intent()
+                intent.putExtra("email", user.email)
+                setResult(RESULT_OK, intent)
+                finish()
             }else{
                 Toast.makeText(this, FireBaseHelper.validaErros(it.exception!!.message!!), Toast.LENGTH_SHORT).show()
             }
