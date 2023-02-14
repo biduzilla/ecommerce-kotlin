@@ -13,6 +13,13 @@
         android:theme="@style/Theme.Ecommerce"
         tools:targetApi="31">
         <activity
+            android:name=".auth.RecuperaContaActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".auth.LoginActivity"
             android:exported="false">
             <meta-data
@@ -21,9 +28,8 @@
         </activity>
         <activity
             android:name=".activity.SplashActivity"
-            android:theme="@style/Theme.Splash"
-            android:exported="true">
-
+            android:exported="true"
+            android:theme="@style/Theme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
