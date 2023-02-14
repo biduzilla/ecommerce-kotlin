@@ -4,10 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import com.google.firebase.auth.FirebaseAuth
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.databinding.ActivityLoginBinding
+import com.toddy.ecommerce.helper.FireBaseHelper
 
 class LoginActivity : AppCompatActivity() {
 
@@ -31,13 +35,50 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    private fun validaDados(){
+        val email:String = binding.edtEmail.text.toString()
+        val senha:String = binding.edtSenha.text.toString()
+
+        when{
+            email.isEmpty() -> {
+                binding.edtEmail.requestFocus()
+                binding.edtEmail.error = "Campo Obrigatório"
+            }
+            senha.isEmpty() -> {
+                binding.edtSenha.requestFocus()
+                binding.edtSenha.error = "Campo Obrigatório"
+            }
+            else -> {
+                binding.progressBar.visibility = View.VISIBLE
+                login(email,senha)
+            }
+        }
+    }
+
+    private fun login(email:String,senha:String){
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, senha).addOnCompleteListener {
+            if (it.isSuccessful){
+                finish()
+            }else {
+                binding.progressBar.visibility = View.GONE
+                Toast.makeText(this, FireBaseHelper.validaErros(it.exception!!.message!!),Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    }
+
     private fun configClicks() {
+        binding.btnVoltar.ibVoltar.setOnClickListener { finish() }
+
         binding.btnRecuperarSenha.setOnClickListener {
             startActivity(Intent(this, RecuperaContaActivity::class.java))
         }
         binding.btnCadastro.setOnClickListener {
             val intent = Intent(this, CadastrarContaActivity::class.java)
             resultLauncher.launch(intent)
+        }
+        binding.btnLogin.setOnClickListener {
+            validaDados()
         }
     }
 }

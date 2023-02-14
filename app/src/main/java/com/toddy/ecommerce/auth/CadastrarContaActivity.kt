@@ -5,11 +5,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.toddy.ecommerce.R
-
 import com.toddy.ecommerce.helper.FireBaseHelper
 import com.toddy.ecommerce.model.Usuario
 import com.toddy.ecommerce.databinding.ActivityCadastrarContaBinding
