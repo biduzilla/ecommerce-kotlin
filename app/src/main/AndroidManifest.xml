@@ -34,7 +34,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".activity.SplashActivity"
+            android:name=".activity.app.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.Splash">
             <intent-filter>
@@ -48,7 +48,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.usuario.MainActivityUsuario"
             android:exported="false">
 
             <!-- <intent-filter> -->
