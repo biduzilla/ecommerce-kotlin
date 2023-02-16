@@ -46,11 +46,10 @@ class LoginActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()){
                     startActivity(Intent(baseContext,MainActivityUsuario::class.java))
-                    finish()
                 }else{
                     startActivity(Intent(baseContext,MainActivityEmpresa::class.java))
-                    finish()
                 }
+                finish()
             }
 
             override fun onCancelled(error: DatabaseError) {
