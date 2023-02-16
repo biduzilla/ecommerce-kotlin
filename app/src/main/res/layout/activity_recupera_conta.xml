@@ -62,7 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="24dp"
-                android:background="@drawable/bg_btn"
+                android:background="@drawable/btn_pressed"
                 android:text="Enviar"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
