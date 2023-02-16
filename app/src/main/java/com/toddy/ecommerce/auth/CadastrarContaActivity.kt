@@ -10,6 +10,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.toddy.ecommerce.helper.FireBaseHelper
 import com.toddy.ecommerce.model.Usuario
 import com.toddy.ecommerce.databinding.ActivityCadastrarContaBinding
+import com.toddy.ecommerce.model.Loja
+
 class CadastrarContaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCadastrarContaBinding
@@ -57,6 +59,7 @@ class CadastrarContaActivity : AppCompatActivity() {
             }
             else -> {
                 binding.progressBar.visibility = View.VISIBLE
+
                 val user = Usuario()
                 user.nome = nome
                 user.email = email

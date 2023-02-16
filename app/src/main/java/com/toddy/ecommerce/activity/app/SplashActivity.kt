@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import com.toddy.ecommerce.activity.usuario.MainActivityUsuario
 import com.toddy.ecommerce.R
+import com.toddy.ecommerce.auth.LoginActivity
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,7 +16,7 @@ class SplashActivity : AppCompatActivity() {
 
         val handler = Handler(Looper.getMainLooper()).postDelayed(Runnable {
             finish()
-            startActivity(Intent(this, MainActivityUsuario::class.java))
+            startActivity(Intent(this, LoginActivity::class.java))
         }, 3000)
     }
 }

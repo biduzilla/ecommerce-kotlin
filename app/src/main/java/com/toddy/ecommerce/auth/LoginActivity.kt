@@ -9,7 +9,10 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.toddy.ecommerce.R
+import com.toddy.ecommerce.activity.loja.MainActivityEmpresa
+import com.toddy.ecommerce.activity.usuario.MainActivityUsuario
 import com.toddy.ecommerce.databinding.ActivityLoginBinding
 import com.toddy.ecommerce.helper.FireBaseHelper
 
@@ -35,6 +38,28 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    private fun recuperaUsuario(id:String){
+        val reference:DatabaseReference = FirebaseDatabase.getInstance().reference
+            .child("usuarios")
+            .child(id)
+        reference.addListenerForSingleValueEvent(object :ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()){
+                    startActivity(Intent(baseContext,MainActivityUsuario::class.java))
+                    finish()
+                }else{
+                    startActivity(Intent(baseContext,MainActivityEmpresa::class.java))
+                    finish()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
+    }
+
     private fun validaDados(){
         val email:String = binding.edtEmail.text.toString()
         val senha:String = binding.edtSenha.text.toString()
@@ -58,6 +83,7 @@ class LoginActivity : AppCompatActivity() {
     private fun login(email:String,senha:String){
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, senha).addOnCompleteListener {
             if (it.isSuccessful){
+                recuperaUsuario(FirebaseAuth.getInstance().currentUser!!.uid)
                 finish()
             }else {
                 binding.progressBar.visibility = View.GONE
