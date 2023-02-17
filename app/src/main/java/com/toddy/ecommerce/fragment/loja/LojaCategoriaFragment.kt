@@ -30,9 +30,11 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.adapter.CategoriaAdapter
+import com.toddy.ecommerce.databinding.DialogDeleteBinding
 import com.toddy.ecommerce.databinding.DialogFormCategoriaBinding
 import com.toddy.ecommerce.databinding.FragmentLojaCategoriaBinding
 import com.toddy.ecommerce.model.Categoria
+import com.tsuryo.swipeablerv.SwipeLeftRightCallback
 
 
 class LojaCategoriaFragment : Fragment(), CategoriaAdapter.OnClick {
@@ -71,8 +73,15 @@ class LojaCategoriaFragment : Fragment(), CategoriaAdapter.OnClick {
         adapter = CategoriaAdapter(categoriaList, this)
         binding.rvCategorias.adapter = adapter
 
+        binding.rvCategorias.setListener(object : SwipeLeftRightCallback.Listener {
+            override fun onSwipedLeft(position: Int) {
 
+            }
 
+            override fun onSwipedRight(position: Int) {
+                showDialogDelete(categoriaList[position])
+            }
+        })
     }
 
     private fun recuperaCategorias() {
@@ -85,7 +94,7 @@ class LojaCategoriaFragment : Fragment(), CategoriaAdapter.OnClick {
                         binding.textInfo.text = ""
                         categoriaList.clear()
                         snapshot.children.forEach {
-                            val categoria:Categoria = it.getValue(Categoria::class.java)!!
+                            val categoria: Categoria = it.getValue(Categoria::class.java)!!
                             categoriaList.add(categoria)
                         }
                     }
@@ -177,6 +186,43 @@ class LojaCategoriaFragment : Fragment(), CategoriaAdapter.OnClick {
                     categoriaBinding.imgCategoria.setImageBitmap(bitmap)
                 }
             }
+    }
+
+    private fun showDialogDelete(categoria: Categoria) {
+        val alert = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog2)
+
+        val deleteBiding: DialogDeleteBinding =
+            DialogDeleteBinding.inflate(LayoutInflater.from(context))
+
+        deleteBiding.btnFechar.setOnClickListener {
+            adapter.notifyDataSetChanged()
+            alertDialog.dismiss()
+        }
+
+        deleteBiding.btnSim.setOnClickListener {
+            categoriaList.remove(categoria)
+
+            if (categoriaList.isEmpty()) {
+                binding.textInfo.text = "Nenhuma categoria cadastrada"
+            } else {
+                binding.textInfo.text = ""
+            }
+
+            categoria.remove()
+
+            FirebaseStorage.getInstance().reference
+                .child("imagens")
+                .child("categorias")
+                .child("${categoria.id}.jpeg").delete()
+            adapter.notifyDataSetChanged()
+            alertDialog.dismiss()
+
+        }
+
+        alert.setView(deleteBiding.root)
+
+        alertDialog = alert.create()
+        alertDialog.show()
     }
 
     private fun showDialog() {

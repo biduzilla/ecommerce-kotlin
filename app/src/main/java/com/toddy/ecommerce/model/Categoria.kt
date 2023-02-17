@@ -19,4 +19,8 @@ class Categoria(private val reference: DatabaseReference = FirebaseDatabase.getI
     fun salvar() {
         reference.child("categorias").child(this.id).setValue(this)
     }
+
+    fun remove() {
+        reference.child("categorias").child(this.id).removeValue()
+    }
 }

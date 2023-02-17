@@ -11,8 +11,8 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-<!--        <item name="android:windowLightStatusBar">true</item>-->
-<!--        deixar os icones do status na cor preta-->
+        <!--        <item name="android:windowLightStatusBar">true</item>-->
+        <!--        deixar os icones do status na cor preta-->
         <!-- Customize your theme here. -->
     </style>
 
@@ -33,5 +33,9 @@
     <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowBackground">@drawable/bg_dialog</item>
         <item name="android:windowMinWidthMinor">80%</item>
+    </style>
+
+    <style name="CustomAlertDialog2" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
     </style>
 </resources>

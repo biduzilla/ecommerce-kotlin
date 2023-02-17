@@ -7,6 +7,7 @@
     tools:context=".fragment.loja.LojaCategoriaFragment">
 
     <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -19,8 +20,8 @@
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
             android:indeterminateTint="@color/color_laranja" />
 
         <TextView
@@ -36,8 +37,11 @@
         android:id="@+id/rvCategorias"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:rightBgColor="@color/color_vermelho"
-        app:rightImage="@drawable/ic_delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:leftBgColor="@color/color_vermelho"
+        app:leftImage="@drawable/ic_delete"
         tools:listitem="@layout/item_categoria_horizontal" />
 
     <ImageButton
