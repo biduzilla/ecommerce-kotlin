@@ -1,13 +1,26 @@
 package com.toddy.ecommerce.fragment.loja
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.normal.TedPermission
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.databinding.DialogFormCategoriaBinding
 import com.toddy.ecommerce.databinding.FragmentLojaCategoriaBinding
@@ -17,7 +30,11 @@ class LojaCategoriaFragment : Fragment() {
 
     private var _binding: FragmentLojaCategoriaBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var categoriaBinding: DialogFormCategoriaBinding
     private lateinit var alertDialog: AlertDialog
+    private lateinit var resultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var caminhoImagem: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,7 +46,9 @@ class LojaCategoriaFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        startResult()
         configClicks()
+
     }
 
     private fun configClicks() {
@@ -53,14 +72,70 @@ class LojaCategoriaFragment : Fragment() {
 //        })
     }
 
+    private fun verificaPermissaoGaleria() {
+        val permissionListener = object : PermissionListener {
+            override fun onPermissionGranted() {
+                abrirGaleria()
+            }
+
+            override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                Toast.makeText(context, "Permissão Negada", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        TedPermission.create().setPermissionListener(permissionListener)
+            .setDeniedMessage("Se você não aceitar a permissão não poderá acessar a galeria do dispositivo, deseja aceitar a permissão?")
+            .setDeniedTitle("Permissões")
+            .setDeniedCloseButtonText("Não")
+            .setGotoSettingButtonText("Sim")
+            .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
+            .check()
+    }
+
+    private fun abrirGaleria() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        resultLauncher.launch(intent)
+    }
+
+    private fun startResult() {
+        resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == Activity.RESULT_OK) {
+                    val imgSelecionada: Uri = it.data!!.data!!
+                    val bitmap: Bitmap
+
+                    caminhoImagem = imgSelecionada.toString()
+
+                    bitmap = if (Build.VERSION.SDK_INT < 28) {
+                        MediaStore.Images.Media.getBitmap(
+                            requireActivity().contentResolver,
+                            imgSelecionada
+                        )
+                    } else {
+                        val source: ImageDecoder.Source =
+                            ImageDecoder.createSource(
+                                requireActivity().contentResolver,
+                                imgSelecionada
+                            )
+                        ImageDecoder.decodeBitmap(source)
+                    }
+                    categoriaBinding.imgCategoria.setImageBitmap(bitmap)
+                }
+            }
+    }
 
     private fun showDialog() {
         val alert = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
-        val categoriaBinding = DialogFormCategoriaBinding.inflate(LayoutInflater.from(context))
+
+        categoriaBinding = DialogFormCategoriaBinding.inflate(LayoutInflater.from(context))
 
         categoriaBinding.btnFechar.setOnClickListener { alertDialog.dismiss() }
 
         categoriaBinding.btnSalvar.setOnClickListener { alertDialog.dismiss() }
+
+        categoriaBinding.imgCategoria.setOnClickListener {
+            verificaPermissaoGaleria()
+        }
 
         alert.setView(categoriaBinding.root)
 
