@@ -2,6 +2,7 @@ package com.toddy.ecommerce.fragment.loja
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -14,16 +15,21 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.databinding.DialogFormCategoriaBinding
 import com.toddy.ecommerce.databinding.FragmentLojaCategoriaBinding
+import com.toddy.ecommerce.model.Categoria
 
 
 class LojaCategoriaFragment : Fragment() {
@@ -34,7 +40,9 @@ class LojaCategoriaFragment : Fragment() {
     private lateinit var categoriaBinding: DialogFormCategoriaBinding
     private lateinit var alertDialog: AlertDialog
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
-    private lateinit var caminhoImagem: String
+    private var caminhoImagem: String? = null
+
+    private var categoria:Categoria? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -131,7 +139,38 @@ class LojaCategoriaFragment : Fragment() {
 
         categoriaBinding.btnFechar.setOnClickListener { alertDialog.dismiss() }
 
-        categoriaBinding.btnSalvar.setOnClickListener { alertDialog.dismiss() }
+        categoriaBinding.btnSalvar.setOnClickListener {
+            val nomeCategoria: String = categoriaBinding.edtCategoria.text.toString()
+//            if (nomeCategoria.isNotEmpty()) {
+//                categoriaBinding.progressBar.visibility = View.VISIBLE
+//                if (caminhoImagem != null) {
+//                    categoria.nome = nomeCategoria
+//                    categoria.todas = categoriaBinding.cbTodos.isChecked
+//                } else {
+//                    ocultarTeclado()
+//                    Toast.makeText(context, "Selecione uma imagem", Toast.LENGTH_SHORT).show()
+//                }
+//            } else {
+//                categoriaBinding.edtCategoria.error = "Campo Obrigatório"
+//
+//            }
+
+            when {
+                nomeCategoria.isEmpty() -> categoriaBinding.edtCategoria.error = "Campo Obrigatório"
+                caminhoImagem == null -> {
+                    ocultarTeclado()
+                    Toast.makeText(context, "Selecione uma imagem", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    ocultarTeclado()
+                    categoria = Categoria()
+                    categoriaBinding.progressBar.visibility = View.VISIBLE
+                    categoria!!.nome = nomeCategoria
+                    categoria!!.todas = categoriaBinding.cbTodos.isChecked
+                    salvarImgFirebase()
+                }
+            }
+        }
 
         categoriaBinding.imgCategoria.setOnClickListener {
             verificaPermissaoGaleria()
@@ -141,5 +180,34 @@ class LojaCategoriaFragment : Fragment() {
 
         alertDialog = alert.create()
         alertDialog.show()
+    }
+
+    private fun salvarImgFirebase() {
+        val reference: StorageReference = FirebaseStorage.getInstance().reference
+            .child("imagens")
+            .child("categorias")
+            .child("${categoria!!.id}.jpeg")
+
+        val uploadTask: UploadTask = reference.putFile(Uri.parse(caminhoImagem))
+
+        uploadTask.addOnSuccessListener {
+            reference.downloadUrl.addOnCompleteListener { task ->
+                val urlImg: String = task.result.toString()
+                categoria!!.urlImagem = urlImg
+                categoria!!.salvar()
+                alertDialog.dismiss()
+
+                categoria = null
+            }.addOnFailureListener {
+                alertDialog.dismiss()
+                Toast.makeText(context, "Error ao salvar imagem", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun ocultarTeclado() {
+        val imm =
+            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(requireView().windowToken, 0)
     }
 }
