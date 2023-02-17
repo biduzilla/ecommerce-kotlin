@@ -11,4 +11,5 @@
     <color name="color_cinza">#e4e4e4</color>
     <color name="colorIconeOnBnv">#fc6e20</color>
     <color name="colorIconeOffBnv">#a59d98</color>
+    <color name="color_vermelho">#f44336</color>
 </resources>

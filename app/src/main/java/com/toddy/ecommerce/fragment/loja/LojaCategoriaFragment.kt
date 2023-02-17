@@ -21,28 +21,33 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.toddy.ecommerce.R
+import com.toddy.ecommerce.adapter.CategoriaAdapter
 import com.toddy.ecommerce.databinding.DialogFormCategoriaBinding
 import com.toddy.ecommerce.databinding.FragmentLojaCategoriaBinding
 import com.toddy.ecommerce.model.Categoria
 
 
-class LojaCategoriaFragment : Fragment() {
+class LojaCategoriaFragment : Fragment(), CategoriaAdapter.OnClick {
 
+    private lateinit var categoriaBinding: DialogFormCategoriaBinding
     private var _binding: FragmentLojaCategoriaBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var categoriaBinding: DialogFormCategoriaBinding
     private lateinit var alertDialog: AlertDialog
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
-    private var caminhoImagem: String? = null
 
-    private var categoria:Categoria? = null
+    private var categoriaList = mutableListOf<Categoria>()
+    private var caminhoImagem: String? = null
+    private var categoria: Categoria? = null
+    private lateinit var adapter: CategoriaAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,8 +59,50 @@ class LojaCategoriaFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        recuperaCategorias()
         startResult()
         configClicks()
+        configRv()
+    }
+
+    private fun configRv() {
+        binding.rvCategorias.layoutManager = LinearLayoutManager(context)
+        binding.rvCategorias.setHasFixedSize(true)
+        adapter = CategoriaAdapter(categoriaList, this)
+        binding.rvCategorias.adapter = adapter
+
+
+
+    }
+
+    private fun recuperaCategorias() {
+        val reference: DatabaseReference =
+            FirebaseDatabase.getInstance().reference.child("categorias")
+        reference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                when {
+                    snapshot.exists() -> {
+                        binding.textInfo.text = ""
+                        categoriaList.clear()
+                        snapshot.children.forEach {
+                            val categoria:Categoria = it.getValue(Categoria::class.java)!!
+                            categoriaList.add(categoria)
+                        }
+                    }
+                    else -> {
+                        binding.textInfo.text = "Nenhuma categoria cadastrada"
+                    }
+                }
+                binding.progressBar.visibility = View.GONE
+                categoriaList.reverse()
+                adapter.notifyDataSetChanged()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+        })
 
     }
 
@@ -196,5 +243,9 @@ class LojaCategoriaFragment : Fragment() {
         val imm =
             requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(requireView().windowToken, 0)
+    }
+
+    override fun onClickListener(categoria: Categoria) {
+        Toast.makeText(context, categoria.urlImagem, Toast.LENGTH_SHORT).show()
     }
 }
