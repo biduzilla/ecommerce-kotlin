@@ -141,19 +141,6 @@ class LojaCategoriaFragment : Fragment() {
 
         categoriaBinding.btnSalvar.setOnClickListener {
             val nomeCategoria: String = categoriaBinding.edtCategoria.text.toString()
-//            if (nomeCategoria.isNotEmpty()) {
-//                categoriaBinding.progressBar.visibility = View.VISIBLE
-//                if (caminhoImagem != null) {
-//                    categoria.nome = nomeCategoria
-//                    categoria.todas = categoriaBinding.cbTodos.isChecked
-//                } else {
-//                    ocultarTeclado()
-//                    Toast.makeText(context, "Selecione uma imagem", Toast.LENGTH_SHORT).show()
-//                }
-//            } else {
-//                categoriaBinding.edtCategoria.error = "Campo Obrigatório"
-//
-//            }
 
             when {
                 nomeCategoria.isEmpty() -> categoriaBinding.edtCategoria.error = "Campo Obrigatório"
