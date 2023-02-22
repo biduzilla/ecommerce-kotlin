@@ -11,9 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -28,6 +26,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
+import com.squareup.picasso.Picasso
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.adapter.CategoriaAdapter
 import com.toddy.ecommerce.databinding.DialogDeleteBinding
@@ -117,6 +116,7 @@ class LojaCategoriaFragment : Fragment(), CategoriaAdapter.OnClick {
 
     private fun configClicks() {
         binding.btnAddCategoria.setOnClickListener {
+            categoria = null
             showDialog()
         }
 
@@ -230,25 +230,65 @@ class LojaCategoriaFragment : Fragment(), CategoriaAdapter.OnClick {
 
         categoriaBinding = DialogFormCategoriaBinding.inflate(LayoutInflater.from(context))
 
+        if (categoria != null) {
+            categoriaBinding.edtCategoria.setText(categoria!!.nome)
+            Picasso.get().load(categoria!!.urlImagem).into(categoriaBinding.imgCategoria)
+            categoriaBinding.cbTodos.isChecked = categoria!!.todas
+        }
+
         categoriaBinding.btnFechar.setOnClickListener { alertDialog.dismiss() }
 
         categoriaBinding.btnSalvar.setOnClickListener {
             val nomeCategoria: String = categoriaBinding.edtCategoria.text.toString()
 
-            when {
-                nomeCategoria.isEmpty() -> categoriaBinding.edtCategoria.error = "Campo Obrigatório"
-                caminhoImagem == null -> {
-                    ocultarTeclado()
-                    Toast.makeText(context, "Selecione uma imagem", Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-                    ocultarTeclado()
-                    categoria = Categoria()
-                    categoriaBinding.progressBar.visibility = View.VISIBLE
-                    categoria!!.nome = nomeCategoria
-                    categoria!!.todas = categoriaBinding.cbTodos.isChecked
+//            when {
+//                nomeCategoria.isEmpty() -> categoriaBinding.edtCategoria.error = "Campo Obrigatório"
+//                caminhoImagem == null && categoria == null -> {
+//                    ocultarTeclado()
+//                    Toast.makeText(context, "Selecione uma imagem", Toast.LENGTH_SHORT).show()
+//                }
+//                categoria != null && categoria!!.urlImagem != "" -> {
+//                    categoriaBinding.progressBar.visibility = View.VISIBLE
+//                    categoria!!.salvar()
+//                }
+//                else -> {
+//                    ocultarTeclado()
+//                    categoria = Categoria()
+//                    categoriaBinding.progressBar.visibility = View.VISIBLE
+//                    categoria!!.nome = nomeCategoria
+//                    categoria!!.todas = categoriaBinding.cbTodos.isChecked
+//                    salvarImgFirebase()
+//                }
+//            }
+
+            if (nomeCategoria.isNotEmpty()) {
+
+                if (categoria == null) categoria = Categoria()
+
+                categoria!!.nome = nomeCategoria
+                categoria!!.todas = categoriaBinding.cbTodos.isChecked
+
+                ocultarTeclado()
+
+                categoriaBinding.progressBar.visibility = View.VISIBLE
+
+                if (caminhoImagem != null) { // Novo cadastro ou edição da imagem
                     salvarImgFirebase()
+
+                } else if (categoria!!.urlImagem != null) { // Edição de nome ou checkBox
+                    categoria!!.salvar()
+                    alertDialog.dismiss()
+
+                } else { // Não preencheu a imagem
+                    categoriaBinding.progressBar.visibility = View.GONE
+                    Toast.makeText(
+                        context,
+                        "Escolha uma imagem para a categoria.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+            } else {
+                categoriaBinding.edtCategoria.error = "Informação obrigatória."
             }
         }
 
@@ -292,6 +332,8 @@ class LojaCategoriaFragment : Fragment(), CategoriaAdapter.OnClick {
     }
 
     override fun onClickListener(categoria: Categoria) {
-        Toast.makeText(context, categoria.urlImagem, Toast.LENGTH_SHORT).show()
+        this.categoria = categoria
+
+        showDialog()
     }
 }
