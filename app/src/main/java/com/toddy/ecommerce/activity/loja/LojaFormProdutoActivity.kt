@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.normal.TedPermission
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.databinding.ActivityLojaFormProdutoBinding
 import com.toddy.ecommerce.databinding.BottomSheetFormProdutoBinding
@@ -45,19 +47,73 @@ class LojaFormProdutoActivity : AppCompatActivity() {
         bottonSheetDialog.show()
 
         sheetBinding.btnCamera.setOnClickListener {
-            Toast.makeText(this, "camera", Toast.LENGTH_SHORT).show()
+            verificaPermissaoCamera()
             bottonSheetDialog.dismiss()
         }
 
         sheetBinding.btnGaleria.setOnClickListener {
-            Toast.makeText(this, "galeria", Toast.LENGTH_SHORT).show()
+            verificaPermissaoGaleria()
             bottonSheetDialog.dismiss()
         }
 
         sheetBinding.btnCancelar.setOnClickListener {
-            Toast.makeText(this, "close", Toast.LENGTH_SHORT).show()
             bottonSheetDialog.dismiss()
         }
+    }
 
+    private fun verificaPermissaoCamera() {
+        val permissionListener: PermissionListener = object : PermissionListener {
+            override fun onPermissionGranted() {
+                abrirCamera()
+            }
+
+            override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                Toast.makeText(baseContext, "Permissão Negada", Toast.LENGTH_SHORT).show()
+            }
+        }
+        showDialogPermissao(
+            permissionListener,
+            "Se você não aceitar a permissão não poderá acessar a camera do dispositivo, deseja aceitar a permissão?",
+            listOf(android.Manifest.permission.CAMERA)
+        )
+    }
+
+    private fun verificaPermissaoGaleria() {
+        val permissionListener: PermissionListener = object : PermissionListener {
+            override fun onPermissionGranted() {
+                abrirGaleria()
+            }
+
+            override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                Toast.makeText(baseContext, "Permissão Negada", Toast.LENGTH_SHORT).show()
+            }
+        }
+        showDialogPermissao(
+            permissionListener,
+            "Se você não aceitar a permissão não poderá acessar a galeria do dispositivo, deseja aceitar a permissão?",
+            listOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+        )
+    }
+
+    private fun abrirCamera() {
+    }
+
+    private fun abrirGaleria() {
+    }
+
+
+    private fun showDialogPermissao(
+        permissionListener: PermissionListener,
+        msg: String,
+        perm: List<String>
+    ) {
+        TedPermission.create()
+            .setPermissionListener(permissionListener)
+            .setDeniedTitle("Permissão negada")
+            .setDeniedMessage(msg)
+            .setDeniedCloseButtonText("Não")
+            .setGotoSettingButtonText("Sim")
+            .setPermissions(*perm.toTypedArray())
+            .check()
     }
 }
