@@ -42,6 +42,13 @@
     <style name="EditTextTheme">
         <item name="colorPrimary">@color/color_laranja</item>
         <item name="android:layout_marginStart">-16dp</item>
+    </style>
 
+    <style name="BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyleWrapper</item>
+    </style>
+
+    <style name="BottomSheetStyleWrapper" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
     </style>
 </resources>
