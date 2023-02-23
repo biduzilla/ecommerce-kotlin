@@ -34,7 +34,6 @@ class CategoriaDialogAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val view: View = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_categoria_dialog, parent, false)
-
         return MyViewHolder(view)
     }
 
@@ -55,7 +54,7 @@ class CategoriaDialogAdapter(
     }
 
     override fun getItemCount(): Int {
-        return idCategoriaSelecionada.size
+        return categoriaList.size
     }
 
     interface OnClick {

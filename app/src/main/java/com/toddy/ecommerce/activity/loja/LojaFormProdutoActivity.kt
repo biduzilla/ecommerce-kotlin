@@ -12,12 +12,16 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
@@ -26,8 +30,11 @@ import com.google.firebase.storage.UploadTask
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.toddy.ecommerce.R
+import com.toddy.ecommerce.adapter.CategoriaDialogAdapter
 import com.toddy.ecommerce.databinding.ActivityLojaFormProdutoBinding
 import com.toddy.ecommerce.databinding.BottomSheetFormProdutoBinding
+import com.toddy.ecommerce.databinding.DialogDeleteBinding
+import com.toddy.ecommerce.databinding.DialogFormProdutoCategoriaBinding
 import com.toddy.ecommerce.model.Categoria
 import com.toddy.ecommerce.model.ImagemUpload
 import com.toddy.ecommerce.model.Produto
@@ -36,9 +43,12 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class LojaFormProdutoActivity : AppCompatActivity() {
+class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnClick {
 
     private lateinit var binding: ActivityLojaFormProdutoBinding
+    private lateinit var categoriaBinding: DialogFormProdutoCategoriaBinding
+
+    private var idCategoriaSelecionada = mutableListOf<String>()
 
     private var resultCode: Int = 0
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
@@ -49,14 +59,16 @@ class LojaFormProdutoActivity : AppCompatActivity() {
     private var produto: Produto? = null
     private var novoProduto: Boolean = true
 
+    private lateinit var dialog: AlertDialog
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLojaFormProdutoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        recuperaCategoria()
         configClicks()
         initComponents()
-        recuperaCategoria()
         startResult()
     }
 
@@ -123,6 +135,42 @@ class LojaFormProdutoActivity : AppCompatActivity() {
             }
     }
 
+    private fun configRv() {
+        categoriaBinding.rvCategorias.layoutManager = LinearLayoutManager(this)
+        categoriaBinding.rvCategorias.setHasFixedSize(true)
+        val adapter = CategoriaDialogAdapter(idCategoriaSelecionada, categoriaList, this)
+        categoriaBinding.rvCategorias.adapter = adapter
+    }
+
+    private fun showDialogCategoria() {
+        val alert = AlertDialog.Builder(this, R.style.CustomAlertDialog2)
+        categoriaBinding =
+            DialogFormProdutoCategoriaBinding.inflate(LayoutInflater.from(this))
+
+        categoriaBinding.btnFechar.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        categoriaBinding.btnSalvar.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        if (categoriaList.isEmpty()) {
+            categoriaBinding.textInfo.text = "Nenhuma categoria cadastrada"
+        } else {
+            categoriaBinding.textInfo.text = ""
+        }
+
+        categoriaBinding.progressBar.visibility = View.GONE
+
+        configRv()
+
+        alert.setView(categoriaBinding.root)
+
+        dialog = alert.create()
+        dialog.show()
+    }
+
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
@@ -172,6 +220,10 @@ class LojaFormProdutoActivity : AppCompatActivity() {
         binding.btnSalvar.setOnClickListener {
             validaDados()
         }
+
+        binding.btnEscolherCategoria.setOnClickListener {
+            showDialogCategoria()
+        }
     }
 
     private fun recuperaCategoria() {
@@ -189,14 +241,15 @@ class LojaFormProdutoActivity : AppCompatActivity() {
                     Toast.makeText(baseContext, "Nenhuma categoria cadastrada", Toast.LENGTH_SHORT)
                         .show()
                 }
+                categoriaList.reverse()
                 Log.i("infoteste", "onDataChange: ${categoriaList.size}")
             }
 
             override fun onCancelled(error: DatabaseError) {
 
             }
-
         })
+
     }
 
     private fun initComponents() {
@@ -434,5 +487,9 @@ class LojaFormProdutoActivity : AppCompatActivity() {
             .setGotoSettingButtonText("Sim")
             .setPermissions(*perm.toTypedArray())
             .check()
+    }
+
+    override fun onClickListener(categoria: Categoria) {
+
     }
 }
