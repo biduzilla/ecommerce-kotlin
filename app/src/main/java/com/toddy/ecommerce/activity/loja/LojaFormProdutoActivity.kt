@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -18,6 +19,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
@@ -26,6 +28,7 @@ import com.gun0912.tedpermission.normal.TedPermission
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.databinding.ActivityLojaFormProdutoBinding
 import com.toddy.ecommerce.databinding.BottomSheetFormProdutoBinding
+import com.toddy.ecommerce.model.Categoria
 import com.toddy.ecommerce.model.ImagemUpload
 import com.toddy.ecommerce.model.Produto
 import java.io.File
@@ -41,6 +44,7 @@ class LojaFormProdutoActivity : AppCompatActivity() {
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private lateinit var currentPhotoPath: String
     private var imagemUploadList = mutableListOf<ImagemUpload>()
+    private var categoriaList = mutableListOf<Categoria>()
 
     private var produto: Produto? = null
     private var novoProduto: Boolean = true
@@ -52,6 +56,7 @@ class LojaFormProdutoActivity : AppCompatActivity() {
 
         configClicks()
         initComponents()
+        recuperaCategoria()
         startResult()
     }
 
@@ -167,6 +172,31 @@ class LojaFormProdutoActivity : AppCompatActivity() {
         binding.btnSalvar.setOnClickListener {
             validaDados()
         }
+    }
+
+    private fun recuperaCategoria() {
+        val reference: DatabaseReference = FirebaseDatabase.getInstance().reference
+            .child("categorias")
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    categoriaList.clear()
+                    snapshot.children.forEach {
+                        val categoria: Categoria = it.getValue(Categoria::class.java)!!
+                        categoriaList.add(categoria)
+                    }
+                } else {
+                    Toast.makeText(baseContext, "Nenhuma categoria cadastrada", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                Log.i("infoteste", "onDataChange: ${categoriaList.size}")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+        })
     }
 
     private fun initComponents() {
