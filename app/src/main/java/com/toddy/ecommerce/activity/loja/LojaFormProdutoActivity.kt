@@ -16,11 +16,16 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.databinding.ActivityLojaFormProdutoBinding
 import com.toddy.ecommerce.databinding.BottomSheetFormProdutoBinding
+import com.toddy.ecommerce.model.ImagemUpload
+import com.toddy.ecommerce.model.Produto
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -33,6 +38,10 @@ class LojaFormProdutoActivity : AppCompatActivity() {
     private var resultCode: Int = 0
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private lateinit var currentPhotoPath: String
+    private var imagemUploadList = mutableListOf<ImagemUpload>()
+
+    private val produto: Produto? = null
+    private var novoProduto: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +61,7 @@ class LojaFormProdutoActivity : AppCompatActivity() {
 
                     if (resultCode <= 2) {
                         val imagemSelecionada: Uri = it.data!!.data!!
-
+                        caminhoImagem = imagemSelecionada.toString()
 
                         when (resultCode) {
                             0 -> {
@@ -73,6 +82,8 @@ class LojaFormProdutoActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+
+                        configUploads(caminhoImagem)
 
                     } else {
                         val file = File(currentPhotoPath)
@@ -97,6 +108,7 @@ class LojaFormProdutoActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+                        configUploads(caminhoImagem)
                     }
 
                 }
@@ -247,6 +259,69 @@ class LojaFormProdutoActivity : AppCompatActivity() {
 
     }
 
+    private fun configUploads(caminhoImagem: String) {
+
+        val request: Int = when (resultCode) {
+            0, 3 -> 0
+            1, 4 -> 1
+            2, 5 -> 2
+            else -> 3
+        }
+
+        val imagemUpload = ImagemUpload(request, caminhoImagem)
+        if (imagemUploadList.isNotEmpty()) {
+            var encontrou = false
+            imagemUploadList.forEach {
+                if (it.index == request) {
+                    encontrou = true
+                }
+            }
+
+            if (encontrou) {
+                imagemUploadList[request] = imagemUpload
+            } else {
+                imagemUploadList.add(imagemUpload)
+            }
+        } else {
+            imagemUploadList.add(imagemUpload)
+        }
+    }
+
+    private fun salvarImgFireBase() {
+
+        imagemUploadList.forEachIndexed { index, imagemUpload ->
+            val storage: StorageReference = FirebaseStorage.getInstance().reference
+                .child("imagens")
+                .child("anuncios")
+                .child(produto!!.id)
+                .child("imagem${index}.jpeg")
+
+            val uploadTask: UploadTask = storage.putFile(Uri.parse(imagemUpload.caminhoImagem))
+            uploadTask.addOnSuccessListener {
+                storage.downloadUrl.addOnCompleteListener { task ->
+
+                    if (novoProduto) {
+                        produto.urlsImagens.add(index, task.result.toString())
+                    } else {
+                        produto.urlsImagens[index] = task.result.toString()
+                    }
+
+                    if (imagemUploadList.size == index + 1) {
+                        produto.salvar(novoProduto)
+                    }
+                }.addOnFailureListener {
+                    Toast.makeText(
+                        this,
+                        "Erro com upload da imagem, tente novamente mais tarde",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+        }
+
+
+    }
 
     private fun showDialogPermissao(
         permissionListener: PermissionListener,
