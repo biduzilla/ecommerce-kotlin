@@ -1,6 +1,7 @@
 package com.toddy.ecommerce.activity.loja
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -11,6 +12,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,7 +42,7 @@ class LojaFormProdutoActivity : AppCompatActivity() {
     private lateinit var currentPhotoPath: String
     private var imagemUploadList = mutableListOf<ImagemUpload>()
 
-    private val produto: Produto? = null
+    private var produto: Produto? = null
     private var novoProduto: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -147,6 +149,8 @@ class LojaFormProdutoActivity : AppCompatActivity() {
 
     private fun configClicks() {
 
+        binding.include.ibVoltar.ibVoltar.setOnClickListener { finish() }
+
         binding.imgProduto0.setOnClickListener {
             showBottonSheet(0)
         }
@@ -158,6 +162,58 @@ class LojaFormProdutoActivity : AppCompatActivity() {
         binding.imgProduto2.setOnClickListener {
             showBottonSheet(2)
         }
+
+        binding.btnSalvar.setOnClickListener {
+            validaDados()
+        }
+    }
+
+    private fun validaDados() {
+        val titulo: String = binding.edtTitulo.text.toString().trim()
+        val descricao: String = binding.etdDescricao.text.toString().trim()
+        val valorAntigo: String = binding.edtValorAntigo.text.toString().trim()
+        val valorAtual: String = binding.edtValorAtual.text.toString().trim()
+
+        when {
+            titulo.isEmpty() -> {
+                binding.edtTitulo.requestFocus()
+                binding.edtTitulo.error = "Campo Obrigatório"
+            }
+
+            descricao.isEmpty() -> {
+                binding.etdDescricao.requestFocus()
+                binding.etdDescricao.error = "Campo Obrigatório"
+            }
+            else -> {
+                if (produto == null) produto = Produto()
+                produto!!.titulo = titulo
+                produto!!.descricao = descricao
+                produto!!.valorAntigo = 10.0
+                produto!!.valorAtual = 15.0
+
+                if (novoProduto) {
+                    if (imagemUploadList.size == 3) {
+                        salvarImgFireBase()
+                    } else {
+                        ocultarTeclado()
+                        Toast.makeText(this, "Escolha 3 imagens para o produto", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                } else {
+                    if (imagemUploadList.size > 0) {
+                        salvarImgFireBase()
+                    } else {
+                        produto!!.salvar(false)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun ocultarTeclado() {
+        val imm =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.edtTitulo.windowToken, 0)
     }
 
     private fun showBottonSheet(code: Int) {
@@ -289,25 +345,27 @@ class LojaFormProdutoActivity : AppCompatActivity() {
 
     private fun salvarImgFireBase() {
 
-        imagemUploadList.forEachIndexed { index, imagemUpload ->
+        imagemUploadList.forEach {
             val storage: StorageReference = FirebaseStorage.getInstance().reference
                 .child("imagens")
-                .child("anuncios")
+                .child("produtos")
                 .child(produto!!.id)
-                .child("imagem${index}.jpeg")
+                .child("imagem${it.index}.jpeg")
 
-            val uploadTask: UploadTask = storage.putFile(Uri.parse(imagemUpload.caminhoImagem))
-            uploadTask.addOnSuccessListener {
+            val uploadTask: UploadTask = storage.putFile(Uri.parse(it.caminhoImagem))
+            uploadTask.addOnSuccessListener { uploadTask ->
                 storage.downloadUrl.addOnCompleteListener { task ->
 
-                    if (novoProduto) {
-                        produto.urlsImagens.add(index, task.result.toString())
-                    } else {
-                        produto.urlsImagens[index] = task.result.toString()
-                    }
+                    it.caminhoImagem = task.result.toString()
+                    produto!!.urlsImagens.add(it)
+//                    if (novoProduto) {
+//                        produto!!.urlsImagens.add(it)
+//                    } else {
+//                        produto!!.urlsImagens[index] = task.result.toString()
+//                    }
 
-                    if (imagemUploadList.size == index + 1) {
-                        produto.salvar(novoProduto)
+                    if (imagemUploadList.size == it.index + 1) {
+                        produto!!.salvar(novoProduto)
                     }
                 }.addOnFailureListener {
                     Toast.makeText(

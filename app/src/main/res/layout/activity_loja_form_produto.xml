@@ -51,9 +51,9 @@
 
                         <ImageView
                             android:id="@+id/imgProduto0"
-                            android:scaleType="centerCrop"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop" />
 
                         <ImageView
                             android:id="@+id/imgFake0"
@@ -75,9 +75,9 @@
 
                         <ImageView
                             android:id="@+id/imgProduto1"
-                            android:scaleType="centerCrop"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop" />
 
                         <ImageView
                             android:id="@+id/imgFake1"
@@ -97,9 +97,9 @@
 
                         <ImageView
                             android:id="@+id/imgProduto2"
-                            android:scaleType="centerCrop"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop" />
 
                         <ImageView
                             android:id="@+id/imgFake2"
@@ -129,6 +129,7 @@
                     android:theme="@style/EditTextTheme">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtTitulo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:backgroundTint="@android:color/transparent"
@@ -142,6 +143,7 @@
                     android:theme="@style/EditTextTheme">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etdDescricao"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:backgroundTint="@android:color/transparent"
@@ -162,6 +164,7 @@
                         android:theme="@style/EditTextTheme">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtValorAntigo"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:backgroundTint="@android:color/transparent"
@@ -176,6 +179,7 @@
                         android:theme="@style/EditTextTheme">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtValorAtual"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:backgroundTint="@android:color/transparent"
@@ -192,7 +196,7 @@
                     android:textAllCaps="false" />
 
                 <android.widget.Button
-                    android:id="@+id/btnLogin"
+                    android:id="@+id/btnSalvar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
