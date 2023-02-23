@@ -51,6 +51,7 @@ class LojaFormProdutoActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         configClicks()
+        initComponents()
         startResult()
     }
 
@@ -168,11 +169,16 @@ class LojaFormProdutoActivity : AppCompatActivity() {
         }
     }
 
+    private fun initComponents() {
+        binding.edtValorAntigo.locale = Locale("PT", "br")
+        binding.edtValorAtual.locale = Locale("PT", "br")
+    }
+
     private fun validaDados() {
         val titulo: String = binding.edtTitulo.text.toString().trim()
         val descricao: String = binding.etdDescricao.text.toString().trim()
-        val valorAntigo: String = binding.edtValorAntigo.text.toString().trim()
-        val valorAtual: String = binding.edtValorAtual.text.toString().trim()
+        val valorAntigo: Double = binding.edtValorAntigo.rawValue.toDouble()
+        val valorAtual: Double = binding.edtValorAtual.rawValue.toDouble()
 
         when {
             titulo.isEmpty() -> {
@@ -184,12 +190,16 @@ class LojaFormProdutoActivity : AppCompatActivity() {
                 binding.etdDescricao.requestFocus()
                 binding.etdDescricao.error = "Campo Obrigatório"
             }
+            valorAtual <= 0 -> {
+                binding.edtValorAtual.requestFocus()
+                binding.edtValorAtual.error = "Valor Inválido"
+            }
             else -> {
                 if (produto == null) produto = Produto()
                 produto!!.titulo = titulo
                 produto!!.descricao = descricao
-                produto!!.valorAntigo = 10.0
-                produto!!.valorAtual = 15.0
+                if (valorAntigo > 0) produto!!.valorAntigo = valorAntigo / 100
+                produto!!.valorAtual = valorAtual / 100
 
                 if (novoProduto) {
                     if (imagemUploadList.size == 3) {
