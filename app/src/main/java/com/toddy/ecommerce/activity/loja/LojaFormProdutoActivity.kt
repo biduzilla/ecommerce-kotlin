@@ -23,6 +23,7 @@ import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -47,19 +48,19 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
 
     private lateinit var binding: ActivityLojaFormProdutoBinding
     private lateinit var categoriaBinding: DialogFormProdutoCategoriaBinding
+    private lateinit var dialog: AlertDialog
 
     private var idCategoriaSelecionada = mutableListOf<String>()
+    private var categoriaList = mutableListOf<Categoria>()
+    private var categoriaSelecionadaList = mutableListOf<String>()
 
     private var resultCode: Int = 0
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private lateinit var currentPhotoPath: String
     private var imagemUploadList = mutableListOf<ImagemUpload>()
-    private var categoriaList = mutableListOf<Categoria>()
 
     private var produto: Produto? = null
     private var novoProduto: Boolean = true
-
-    private lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -277,12 +278,22 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
                 binding.edtValorAtual.requestFocus()
                 binding.edtValorAtual.error = "Valor Inválido"
             }
+            idCategoriaSelecionada.isEmpty() -> {
+                Toast.makeText(
+                    this,
+                    "Selecione pelo menos uma categoria para o produto",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
             else -> {
+                Toast.makeText(this, "Salvando", Toast.LENGTH_SHORT).show()
                 if (produto == null) produto = Produto()
+
                 produto!!.titulo = titulo
                 produto!!.descricao = descricao
                 if (valorAntigo > 0) produto!!.valorAntigo = valorAntigo / 100
                 produto!!.valorAtual = valorAtual / 100
+                produto!!.idsCategoria = idCategoriaSelecionada
 
                 if (novoProduto) {
                     if (imagemUploadList.size == 3) {
@@ -299,6 +310,7 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
                         produto!!.salvar(false)
                     }
                 }
+                Toast.makeText(this, "Salvo", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -491,5 +503,13 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
 
     override fun onClickListener(categoria: Categoria) {
 
+        if (!idCategoriaSelecionada.contains(categoria.id)) {
+            idCategoriaSelecionada.add(categoria.id)
+            categoriaSelecionadaList.add(categoria.nome)
+        } else {
+            idCategoriaSelecionada.remove(categoria.id)
+            categoriaSelecionadaList.remove(categoria.nome)
+        }
+        Log.i("infoteste", idCategoriaSelecionada.size.toString())
     }
 }
