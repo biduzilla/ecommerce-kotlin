@@ -99,6 +99,8 @@ class LojaProdutoFragment : Fragment(), LojaProdutoAdapter.OnClick {
         val dialogBinding: DialogLojaProdutoBinding =
             DialogLojaProdutoBinding.inflate(LayoutInflater.from(requireContext()))
 
+        dialogBinding.checkbox.isChecked = produto.rascunho
+
         produto.urlsImagens.forEach {
             if (it.index == 0) {
                 Picasso.get().load(it.caminhoImagem).into(dialogBinding.imgProduto)
@@ -107,6 +109,11 @@ class LojaProdutoFragment : Fragment(), LojaProdutoAdapter.OnClick {
         dialogBinding.textNomeProduto.text = produto.titulo
 
         dialogBinding.btnFechar.setOnClickListener { dialog!!.dismiss() }
+
+        dialogBinding.checkbox.setOnCheckedChangeListener { check, b ->
+            produto.rascunho = check.isChecked
+            produto.salvar(false)
+        }
 
         builder.setView(dialogBinding.root)
 
