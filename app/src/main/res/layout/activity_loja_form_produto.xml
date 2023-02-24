@@ -51,6 +51,7 @@
 
                         <ImageView
                             android:id="@+id/imgProduto0"
+                            android:padding="8dp"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop" />
@@ -75,6 +76,7 @@
 
                         <ImageView
                             android:id="@+id/imgProduto1"
+                            android:padding="8dp"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop" />
@@ -97,6 +99,7 @@
 
                         <ImageView
                             android:id="@+id/imgProduto2"
+                            android:padding="8dp"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop" />
@@ -136,6 +139,7 @@
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_edit_off"
                     android:textColor="@color/black"
+                    android:inputType="text"
                     android:textColorHint="@android:color/darker_gray"
                     android:hint="Mochila Toddys"
                     android:padding="16dp" />

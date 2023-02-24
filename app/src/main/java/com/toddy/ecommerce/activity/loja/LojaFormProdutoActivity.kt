@@ -73,6 +73,10 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
         startResult()
     }
 
+    private fun getExtras() {
+
+    }
+
     private fun startResult() {
         resultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -256,6 +260,12 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
     private fun initComponents() {
         binding.edtValorAntigo.locale = Locale("PT", "br")
         binding.edtValorAtual.locale = Locale("PT", "br")
+
+        if (novoProduto) {
+            binding.include.tvTitulo.text = "Novo Produto"
+        } else {
+            binding.include.tvTitulo.text = "Edição Produto"
+        }
     }
 
     private fun validaDados() {
