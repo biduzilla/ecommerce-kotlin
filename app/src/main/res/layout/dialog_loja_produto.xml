@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:padding="16dp"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="16dp">
 
     <ImageView
         android:id="@+id/btnFechar"
@@ -20,6 +20,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="16dp"
+        android:padding="8dp"
         app:cardCornerRadius="5dp"
         app:cardElevation="5dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,7 +30,8 @@
         <ImageView
             android:id="@+id/imgProduto"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
 
     </androidx.cardview.widget.CardView>
 
@@ -42,6 +44,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textAlignment="center"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView3"
@@ -86,7 +89,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Rascunho"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/black" />
         </LinearLayout>
 
         <LinearLayout
@@ -116,7 +120,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Editar"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/black" />
         </LinearLayout>
 
         <LinearLayout
@@ -134,7 +139,7 @@
                 app:cardCornerRadius="5dp">
 
                 <ImageView
-                    android:id="@+id/btnEditar"
+                    android:id="@+id/btnDeletar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -147,7 +152,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Remover"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textColor="@color/black" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

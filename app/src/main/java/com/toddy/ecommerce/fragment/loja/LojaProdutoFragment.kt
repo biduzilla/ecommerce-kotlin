@@ -7,12 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.google.firebase.database.*
+import com.squareup.picasso.Picasso
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.activity.loja.LojaFormProdutoActivity
 import com.toddy.ecommerce.adapter.LojaProdutoAdapter
+import com.toddy.ecommerce.databinding.DialogLojaProdutoBinding
 import com.toddy.ecommerce.databinding.FragmentLojaProdutoBinding
 import com.toddy.ecommerce.model.Produto
 import java.util.EventListener
@@ -23,6 +26,7 @@ class LojaProdutoFragment : Fragment(), LojaProdutoAdapter.OnClick {
     private val binding get() = _binding!!
     private var lojaProdutoAdapter: LojaProdutoAdapter? = null
     private var produtoList = mutableListOf<Produto>()
+    private var dialog: AlertDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -90,7 +94,24 @@ class LojaProdutoFragment : Fragment(), LojaProdutoAdapter.OnClick {
     }
 
     private fun showDialog(produto: Produto) {
+        val builder: AlertDialog.Builder =
+            AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
+        val dialogBinding: DialogLojaProdutoBinding =
+            DialogLojaProdutoBinding.inflate(LayoutInflater.from(requireContext()))
 
+        produto.urlsImagens.forEach {
+            if (it.index == 0) {
+                Picasso.get().load(it.caminhoImagem).into(dialogBinding.imgProduto)
+            }
+        }
+        dialogBinding.textNomeProduto.text = produto.titulo
+
+        dialogBinding.btnFechar.setOnClickListener { dialog!!.dismiss() }
+
+        builder.setView(dialogBinding.root)
+
+        dialog = builder.create()
+        dialog!!.show()
     }
 
 }
