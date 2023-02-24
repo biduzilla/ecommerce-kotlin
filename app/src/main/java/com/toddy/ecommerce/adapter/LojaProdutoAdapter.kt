@@ -49,6 +49,10 @@ class LojaProdutoAdapter(
         }
         holder.textValorProduto.text = produto.valorAtual.toString()
         holder.textDescontoProduto.text = "15% OFF"
+
+        holder.itemView.setOnClickListener {
+            OnClickListener.onClickListener(produto)
+        }
     }
 
     override fun getItemCount(): Int {

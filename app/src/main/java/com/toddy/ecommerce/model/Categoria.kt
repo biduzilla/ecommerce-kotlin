@@ -3,7 +3,7 @@ package com.toddy.ecommerce.model
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
-class Categoria(private val reference: DatabaseReference = FirebaseDatabase.getInstance().reference) {
+class Categoria(private val reference: DatabaseReference = FirebaseDatabase.getInstance().reference) :java.io.Serializable{
 
 
     var id: String = ""

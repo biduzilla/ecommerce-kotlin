@@ -4,7 +4,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.Exclude
 import com.google.firebase.database.FirebaseDatabase
 
-class Produto(private val reference: DatabaseReference = FirebaseDatabase.getInstance().reference) {
+class Produto(private val reference: DatabaseReference = FirebaseDatabase.getInstance().reference) :java.io.Serializable{
     var id: String = ""
     var idLocal: Int = 0
         @Exclude

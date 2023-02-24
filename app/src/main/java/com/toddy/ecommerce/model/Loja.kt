@@ -3,7 +3,7 @@ package com.toddy.ecommerce.model
 import com.google.firebase.database.Exclude
 import com.google.firebase.database.FirebaseDatabase
 
-class Loja {
+class Loja:java.io.Serializable {
 
     var id:String = ""
     var nome:String = ""

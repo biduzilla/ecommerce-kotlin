@@ -4,7 +4,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.Exclude
 import com.google.firebase.database.FirebaseDatabase
 
-class Usuario {
+class Usuario : java.io.Serializable {
     var id: String = ""
     var nome: String = ""
     var email: String = ""
