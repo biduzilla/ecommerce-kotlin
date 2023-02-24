@@ -86,7 +86,11 @@ class LojaProdutoFragment : Fragment(), LojaProdutoAdapter.OnClick {
     }
 
     override fun onClickListener(produto: Produto) {
-        Toast.makeText(requireContext(), produto.titulo, Toast.LENGTH_SHORT).show()
+        showDialog(produto)
+    }
+
+    private fun showDialog(produto: Produto) {
+
     }
 
 }
