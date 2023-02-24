@@ -260,7 +260,7 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
 
     private fun validaDados() {
         val titulo: String = binding.edtTitulo.text.toString().trim()
-        val descricao: String = binding.etdDescricao.text.toString().trim()
+        val descricao: String = binding.edtDescricao.text.toString().trim()
         val valorAntigo: Double = binding.edtValorAntigo.rawValue.toDouble()
         val valorAtual: Double = binding.edtValorAtual.rawValue.toDouble()
 
@@ -271,8 +271,8 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
             }
 
             descricao.isEmpty() -> {
-                binding.etdDescricao.requestFocus()
-                binding.etdDescricao.error = "Campo Obrigatório"
+                binding.edtDescricao.requestFocus()
+                binding.edtDescricao.error = "Campo Obrigatório"
             }
             valorAtual <= 0 -> {
                 binding.edtValorAtual.requestFocus()
