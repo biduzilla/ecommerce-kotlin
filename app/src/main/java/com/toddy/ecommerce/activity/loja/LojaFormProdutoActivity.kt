@@ -510,6 +510,24 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
             idCategoriaSelecionada.remove(categoria.id)
             categoriaSelecionadaList.remove(categoria.nome)
         }
-        Log.i("infoteste", idCategoriaSelecionada.size.toString())
+        Log.i("infotext", categoriaSelecionadaList.size.toString())
+        categoriasSelecionadas()
+    }
+
+    private fun categoriasSelecionadas() {
+        val builder: StringBuilder = StringBuilder()
+        categoriaSelecionadaList.forEach {
+            if (it == categoriaSelecionadaList.last()) {
+                builder.append(it)
+            } else {
+                builder.append(it).append(", ")
+
+            }
+        }
+        if (categoriaSelecionadaList.isNotEmpty()) {
+            binding.btnEscolherCategoria.text = builder
+        } else {
+            binding.btnEscolherCategoria.text = "Nenhuma Categoria Selecionada"
+        }
     }
 }
