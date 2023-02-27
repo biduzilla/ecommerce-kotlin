@@ -11,6 +11,7 @@ import com.squareup.picasso.Picasso
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.model.Categoria
 import com.toddy.ecommerce.model.Produto
+import com.toddy.ecommerce.utils.GetMask
 
 class LojaProdutoAdapter(
     private val produtoList: MutableList<Produto>,
@@ -64,7 +65,8 @@ class LojaProdutoAdapter(
                 Picasso.get().load(it.caminhoImagem).into(holder.imgProduto)
             }
         }
-        holder.textValorProduto.text = produto.valorAtual.toString()
+        holder.textValorProduto.text =
+            context.getString(R.string.valor, GetMask.getValor(produto.valorAtual))
 
 
         holder.itemView.setOnClickListener {
