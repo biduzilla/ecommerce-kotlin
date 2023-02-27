@@ -41,6 +41,23 @@ class LojaProdutoAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val produto: Produto = produtoList[position]
+
+        if (produto.valorAntigo > 0) {
+            val resto: Double = produto.valorAntigo - produto.valorAtual
+            val porcentagem: Int = (resto / produto.valorAntigo * 100).toInt()
+
+            if (porcentagem >= 10) {
+                holder.textDescontoProduto.text =
+                    context.getString(R.string.valor_off, porcentagem, "%")
+            } else {
+                val porcent: String = porcentagem.toString().replace("0,", "")
+                holder.textDescontoProduto.text =
+                    context.getString(R.string.valor_off, porcent.toInt(), "%")
+            }
+        } else {
+            holder.textDescontoProduto.visibility = View.GONE
+        }
+
         holder.textNomeProduto.text = produto.titulo
         produto.urlsImagens.forEach {
             if (it.index == 0) {
@@ -48,7 +65,7 @@ class LojaProdutoAdapter(
             }
         }
         holder.textValorProduto.text = produto.valorAtual.toString()
-        holder.textDescontoProduto.text = "15% OFF"
+
 
         holder.itemView.setOnClickListener {
             OnClickListener.onClickListener(produto)
