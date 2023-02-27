@@ -4,10 +4,9 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.Exclude
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
+import java.io.Serializable
 
-class Produto(private val reference: DatabaseReference = FirebaseDatabase.getInstance().reference) :
-    java.io.Serializable {
+class Produto : Serializable {
     var id: String = ""
     var idLocal: Int = 0
         @Exclude
@@ -21,15 +20,22 @@ class Produto(private val reference: DatabaseReference = FirebaseDatabase.getIns
     var urlsImagens = mutableListOf<ImagemUpload>()
 
     init {
+        val reference: DatabaseReference = FirebaseDatabase.getInstance().reference
         this.id = reference.push().key!!
     }
 
     fun salvar(novoProduto: Boolean) {
-        reference.child("produtos").child(this.id).setValue(this)
+        FirebaseDatabase.getInstance().reference
+            .child("produtos")
+            .child(this.id)
+            .setValue(this)
     }
 
     fun remover() {
-        reference.child("produtos").child(this.id).removeValue()
+        FirebaseDatabase.getInstance()
+            .reference.child("produtos")
+            .child(this.id)
+            .removeValue()
 
         urlsImagens.forEach {
             FirebaseStorage.getInstance().reference

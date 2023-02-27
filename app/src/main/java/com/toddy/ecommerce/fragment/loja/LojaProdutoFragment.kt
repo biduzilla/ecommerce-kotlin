@@ -114,6 +114,13 @@ class LojaProdutoFragment : Fragment(), LojaProdutoAdapter.OnClick {
 
         dialogBinding.btnFechar.setOnClickListener { dialog!!.dismiss() }
 
+        dialogBinding.btnEditar.setOnClickListener {
+            val intent = Intent(requireContext(), LojaFormProdutoActivity::class.java)
+            intent.putExtra("produtoSelecionado", produto)
+            startActivity(intent)
+            dialog!!.dismiss()
+        }
+
         dialogBinding.btnDeletar.setOnClickListener {
             produto.remover()
             dialog!!.dismiss()

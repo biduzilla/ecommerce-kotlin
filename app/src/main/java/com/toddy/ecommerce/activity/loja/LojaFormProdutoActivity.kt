@@ -18,6 +18,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +31,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
+import com.squareup.picasso.Picasso
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.adapter.CategoriaDialogAdapter
 import com.toddy.ecommerce.databinding.ActivityLojaFormProdutoBinding
@@ -67,14 +69,55 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
         binding = ActivityLojaFormProdutoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        recuperaCategoria()
+        getExtras()
         configClicks()
         initComponents()
+        recuperaCategoria()
         startResult()
     }
 
     private fun getExtras() {
+        intent.extras?.let {
+            val bundle: Bundle = it
+            produto = bundle.getSerializable("produtoSelecionado") as Produto
+            configProdutos()
+        }
+    }
 
+    private fun configProdutos() {
+        novoProduto = false
+
+        produto!!.urlsImagens.forEach {
+            when (it.index) {
+                0 -> Picasso.get().load(it.caminhoImagem).into(binding.imgProduto0)
+                1 -> Picasso.get().load(it.caminhoImagem).into(binding.imgProduto1)
+                2 -> Picasso.get().load(it.caminhoImagem).into(binding.imgProduto2)
+            }
+        }
+
+        binding.edtTitulo.setText(produto!!.titulo)
+        binding.edtDescricao.setText(produto!!.descricao)
+        binding.edtValorAntigo.setText((produto!!.valorAntigo * 10).toString())
+        binding.edtValorAtual.setText((produto!!.valorAtual * 10).toString())
+
+        binding.imgFake0.visibility = View.GONE
+        binding.imgFake1.visibility = View.GONE
+        binding.imgFake2.visibility = View.GONE
+
+        idCategoriaSelecionada.addAll(produto!!.idsCategoria)
+
+    }
+
+    private fun configCategoriasEdit() {
+        if (!novoProduto) {
+            categoriaList.forEach {
+                if (produto!!.idsCategoria.contains(it.id)) {
+                    categoriaSelecionadaList.add(it.nome)
+                }
+            }
+            categoriaSelecionadaList.reverse()
+            categoriasSelecionadas()
+        }
     }
 
     private fun startResult() {
@@ -242,6 +285,7 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
                         val categoria: Categoria = it.getValue(Categoria::class.java)!!
                         categoriaList.add(categoria)
                     }
+                    configCategoriasEdit()
                 } else {
                     Toast.makeText(baseContext, "Nenhuma categoria cadastrada", Toast.LENGTH_SHORT)
                         .show()
@@ -307,15 +351,21 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
 
                 if (novoProduto) {
                     if (imagemUploadList.size == 3) {
-                        salvarImgFireBase()
+                        imagemUploadList.forEachIndexed { index, imagemUpload ->
+                            salvarImgFireBase(index, imagemUpload)
+                        }
+
                     } else {
                         ocultarTeclado()
                         Toast.makeText(this, "Escolha 3 imagens para o produto", Toast.LENGTH_SHORT)
                             .show()
                     }
                 } else {
+                    ocultarTeclado()
                     if (imagemUploadList.size > 0) {
-                        salvarImgFireBase()
+                        imagemUploadList.forEachIndexed { index, imagemUpload ->
+                            salvarImgFireBase(index, imagemUpload)
+                        }
                     } else {
                         produto!!.salvar(false)
                     }
@@ -458,41 +508,41 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
         }
     }
 
-    private fun salvarImgFireBase() {
+    private fun salvarImgFireBase(count: Int, img: ImagemUpload) {
 
-        imagemUploadList.forEach {
-            val storage: StorageReference = FirebaseStorage.getInstance().reference
-                .child("imagens")
-                .child("produtos")
-                .child(produto!!.id)
-                .child("imagem${it.index}.jpeg")
+        val storage: StorageReference = FirebaseStorage.getInstance().reference
+            .child("imagens")
+            .child("produtos")
+            .child(produto!!.id)
+            .child("imagem${img.index}.jpeg")
 
-            val uploadTask: UploadTask = storage.putFile(Uri.parse(it.caminhoImagem))
-            uploadTask.addOnSuccessListener { uploadTask ->
-                storage.downloadUrl.addOnCompleteListener { task ->
+        val uploadTask: UploadTask = storage.putFile(Uri.parse(img.caminhoImagem))
+        uploadTask.addOnSuccessListener {
+            storage.downloadUrl.addOnCompleteListener { task ->
 
-                    it.caminhoImagem = task.result.toString()
-                    produto!!.urlsImagens.add(it)
-//                    if (novoProduto) {
-//                        produto!!.urlsImagens.add(it)
-//                    } else {
-//                        produto!!.urlsImagens[index] = task.result.toString()
-//                    }
-
-                    if (imagemUploadList.size == it.index + 1) {
-                        produto!!.salvar(novoProduto)
-                    }
-                }.addOnFailureListener {
-                    Toast.makeText(
-                        this,
-                        "Erro com upload da imagem, tente novamente mais tarde",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                img.caminhoImagem = task.result.toString()
+                if (novoProduto) {
+                    produto!!.urlsImagens.add(img)
+                } else {
+                    produto!!.urlsImagens[img.index] = img
                 }
+
+                if (imagemUploadList.size == count + 1) {
+                    produto!!.salvar(novoProduto)
+                    imagemUploadList.clear()
+
+                    if (novoProduto) {
+                        finish()
+                    }
+                }
+            }.addOnFailureListener {
+                Toast.makeText(
+                    this,
+                    "Erro com upload da imagem, tente novamente mais tarde",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-
         }
-
 
     }
 
