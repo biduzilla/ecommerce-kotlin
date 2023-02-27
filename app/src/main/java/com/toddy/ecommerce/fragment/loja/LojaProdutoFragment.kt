@@ -29,8 +29,7 @@ class LojaProdutoFragment : Fragment(), LojaProdutoAdapter.OnClick {
     private var dialog: AlertDialog? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLojaProdutoBinding.inflate(inflater, container, false)
         return binding.root
@@ -73,9 +72,7 @@ class LojaProdutoFragment : Fragment(), LojaProdutoAdapter.OnClick {
                         val produto: Produto = it.getValue(Produto::class.java)!!
                         produtoList.add(produto)
                     }
-                    binding.textInfo.text = ""
-                } else {
-                    binding.textInfo.text = "Nenhum produto cadastrado"
+                    listEmpty()
                 }
                 binding.progressBar.visibility = View.GONE
                 produtoList.reverse()
@@ -83,7 +80,6 @@ class LojaProdutoFragment : Fragment(), LojaProdutoAdapter.OnClick {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
         })
 
@@ -91,6 +87,14 @@ class LojaProdutoFragment : Fragment(), LojaProdutoAdapter.OnClick {
 
     override fun onClickListener(produto: Produto) {
         showDialog(produto)
+    }
+
+    private fun listEmpty() {
+        if (produtoList.isEmpty()) {
+            binding.textInfo.text = "Nenhum produto cadastrado"
+        } else {
+            binding.textInfo.text = ""
+        }
     }
 
     private fun showDialog(produto: Produto) {
@@ -109,6 +113,16 @@ class LojaProdutoFragment : Fragment(), LojaProdutoAdapter.OnClick {
         dialogBinding.textNomeProduto.text = produto.titulo
 
         dialogBinding.btnFechar.setOnClickListener { dialog!!.dismiss() }
+
+        dialogBinding.btnDeletar.setOnClickListener {
+            produto.remover()
+            dialog!!.dismiss()
+            Toast.makeText(requireContext(), "Produto removido com sucesso", Toast.LENGTH_SHORT)
+                .show()
+
+            listEmpty()
+        }
+
 
         dialogBinding.checkbox.setOnCheckedChangeListener { check, b ->
             produto.rascunho = check.isChecked
