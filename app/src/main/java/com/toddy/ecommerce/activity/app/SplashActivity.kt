@@ -17,10 +17,15 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        val handler = Handler(Looper.getMainLooper()).postDelayed(Runnable {
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
 
             verificaAcesso()
-        }, 3000)
+        }, 1500)
+
+//        val handler = Handler(Looper.getMainLooper()).postDelayed(Runnable {
+//
+//            verificaAcesso()
+//        }, 1500)
     }
 
     private fun verificaAcesso() {

@@ -340,7 +340,9 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
                 ).show()
             }
             else -> {
-                Toast.makeText(this, "Salvando", Toast.LENGTH_SHORT).show()
+                binding.btnSalvar.visibility = View.GONE
+                binding.progressBar.visibility = View.VISIBLE
+
                 if (produto == null) produto = Produto()
 
                 produto!!.titulo = titulo
@@ -368,9 +370,11 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
                         }
                     } else {
                         produto!!.salvar(false)
+
+                        binding.btnSalvar.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
                     }
                 }
-                Toast.makeText(this, "Salvo", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -457,7 +461,6 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
                     createImageFile()
                 } catch (ex: IOException) {
                     // Error occurred while creating the File
-
                     null
                 }
                 // Continue only if the File was successfully created
@@ -534,6 +537,8 @@ class LojaFormProdutoActivity : AppCompatActivity(), CategoriaDialogAdapter.OnCl
                     if (novoProduto) {
                         finish()
                     }
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnSalvar.visibility = View.VISIBLE
                 }
             }.addOnFailureListener {
                 Toast.makeText(
