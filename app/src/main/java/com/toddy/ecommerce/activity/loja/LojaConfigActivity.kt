@@ -22,6 +22,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
+import com.squareup.picasso.Picasso
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.databinding.ActivityLojaConfigBinding
 import com.toddy.ecommerce.model.Loja
@@ -51,6 +52,8 @@ class LojaConfigActivity : AppCompatActivity() {
         binding.cardLogo.setOnClickListener {
             verificaPermissaoGaleria()
         }
+
+        binding.include2.ibVoltar.ibVoltar.setOnClickListener { finish() }
 
         binding.btnSalvar.setOnClickListener {
             if (loja != null) {
@@ -99,7 +102,14 @@ class LojaConfigActivity : AppCompatActivity() {
                 loja!!.pedidoMinino = pedidoMinino
                 loja!!.freteGratis = frete
 
-                salvarImgFirebase()
+                if (caminhoImagem != null) {
+                    loja!!.salvar()
+
+                    binding.btnSalvar.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                } else {
+                    salvarImgFirebase()
+                }
             }
         }
     }
@@ -111,6 +121,8 @@ class LojaConfigActivity : AppCompatActivity() {
         reference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 loja = snapshot.getValue(Loja::class.java)
+
+                configDados()
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -118,6 +130,29 @@ class LojaConfigActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    private fun configDados() {
+
+        if (loja!!.urlLogo != "") {
+            Picasso.get().load(loja!!.urlLogo).into(binding.imgLogo)
+        }
+
+        if (loja!!.nome != "") {
+            binding.edtLoja.setText(loja!!.nome)
+        }
+
+        if (loja!!.CNPJ != "") {
+            binding.edtCNPJ.setText(loja!!.CNPJ)
+        }
+
+        if (loja!!.pedidoMinino > 0.0) {
+            binding.edtPedidoMinino.setText((loja!!.pedidoMinino * 10).toString())
+        }
+
+        if (loja!!.freteGratis > 0.0) {
+            binding.edtFrete.setText((loja!!.freteGratis * 10).toString())
+        }
     }
 
     private fun verificaPermissaoGaleria() {
