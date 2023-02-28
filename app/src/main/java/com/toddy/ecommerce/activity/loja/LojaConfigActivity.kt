@@ -49,6 +49,8 @@ class LojaConfigActivity : AppCompatActivity() {
     }
 
     private fun configClicks() {
+        binding.include2.tvTitulo.text = "Configurações"
+
         binding.cardLogo.setOnClickListener {
             verificaPermissaoGaleria()
         }
@@ -80,10 +82,6 @@ class LojaConfigActivity : AppCompatActivity() {
         val frete: Double = (binding.edtFrete.rawValue / 100).toDouble()
 
         when {
-            caminhoImagem == null -> {
-                ocultarTeclado()
-                Toast.makeText(this, "Escolha uma logo para sua loja!", Toast.LENGTH_SHORT).show()
-            }
             nomeLoja.isEmpty() -> {
                 binding.edtLoja.requestFocus()
                 binding.edtLoja.error = "Campo Obrigatório!"
@@ -94,6 +92,7 @@ class LojaConfigActivity : AppCompatActivity() {
                 binding.edtCNPJ.error = "CNPJ Inválido"
             }
             else -> {
+                ocultarTeclado()
                 binding.btnSalvar.visibility = View.GONE
                 binding.progressBar.visibility = View.VISIBLE
 
@@ -102,13 +101,17 @@ class LojaConfigActivity : AppCompatActivity() {
                 loja!!.pedidoMinino = pedidoMinino
                 loja!!.freteGratis = frete
 
-                if (caminhoImagem != null) {
-                    loja!!.salvar()
-
-                    binding.btnSalvar.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                } else {
-                    salvarImgFirebase()
+                when {
+                    caminhoImagem != null -> {
+                        salvarImgFirebase()
+                    }
+                    loja!!.urlLogo != "" -> {
+                        loja!!.salvar()
+                        binding.btnSalvar.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
+                    }
+                    else -> Toast.makeText(this, "Escolha uma logo para a loja", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
@@ -123,6 +126,8 @@ class LojaConfigActivity : AppCompatActivity() {
                 loja = snapshot.getValue(Loja::class.java)
 
                 configDados()
+
+                caminhoImagem = null
             }
 
             override fun onCancelled(error: DatabaseError) {

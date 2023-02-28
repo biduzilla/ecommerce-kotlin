@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.toddy.ecommerce.R
 import com.toddy.ecommerce.activity.loja.LojaConfigActivity
+import com.toddy.ecommerce.activity.loja.LojaRecebimentosActivity
 import com.toddy.ecommerce.databinding.FragmentLojaConfigBinding
 
 class LojaConfigFragment : Fragment() {
@@ -33,6 +34,12 @@ class LojaConfigFragment : Fragment() {
         binding.btnConfigLoja.setOnClickListener {
             startActivity(Intent(requireContext(), LojaConfigActivity::class.java))
         }
+
+        binding.btnPagamentos.setOnClickListener {
+            startActivity(Intent(requireContext(), LojaRecebimentosActivity::class.java))
+        }
+
+
     }
 
 
