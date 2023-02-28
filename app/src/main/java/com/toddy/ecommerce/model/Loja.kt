@@ -7,6 +7,10 @@ class Loja:java.io.Serializable {
 
     var id:String = ""
     var nome:String = ""
+    var urlLogo:String = ""
+    var CNPJ:String = ""
+    var pedidoMinino:Double = 0.0
+    var freteGratis:Double = 0.0
     var email:String = ""
     @Exclude
         get
@@ -19,8 +23,6 @@ class Loja:java.io.Serializable {
         FirebaseDatabase.getInstance().reference
             .child("loja")
             .setValue(this)
-
-
     }
 
 }
